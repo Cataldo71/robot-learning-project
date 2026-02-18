@@ -22,6 +22,11 @@ This is useful for:
 - Learning about vector-based robot control
 """
 
+import sys
+import os
+# Add parent directory to path so we can import robot package
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from robot.mecanum import makeMotorVector, driveMotors, stopMotors
 from robot.motor import initMotors
 import time

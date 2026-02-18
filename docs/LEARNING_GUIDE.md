@@ -431,17 +431,20 @@ You now have all the knowledge to:
 ## 📝 Quick Command Reference
 
 ```bash
-# Examples (No Hardware)
+# Examples (No Hardware) - Can run from any directory
 python3 examples/read_controller.py      # Simple controller test
 python3 examples/controller_simulator.py # Advanced controller test
 
-# Tests (Hardware Required)
+# Tests (Hardware Required) - Can run from any directory
 python3 tests/test_motors.py          # Test individual motors
 python3 tests/test_movements.py       # Test mecanum movements
 python3 examples/tank_drive.py        # Simple tank drive
 
-# Main Program
+# Main Program - Run from project root
 python3 run_robot.py                  # Full robot control ⭐
+
+# Note: Motor tests need sudo for GPIO access
+sudo python3 tests/test_motors.py
 
 # Stop Any Program
 Ctrl+C                                # Press in terminal

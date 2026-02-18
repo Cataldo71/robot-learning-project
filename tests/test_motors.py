@@ -17,6 +17,11 @@ The script will:
 Use this BEFORE running the full robot to ensure all motors work correctly!
 """
 
+import sys
+import os
+# Add parent directory to path so we can import robot package
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from robot.motor import initMotors, moveMotor1, moveMotor2, moveMotor3, moveMotor4
 import time
 

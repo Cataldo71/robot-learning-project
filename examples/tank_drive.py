@@ -26,6 +26,11 @@ Note: This does NOT use mecanum wheel math. For full mecanum control,
 use run_robot.py instead.
 """
 
+import sys
+import os
+# Add parent directory to path so we can import robot package
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from robot import controller
 from robot import motor
 from robot.controller import eventLoop

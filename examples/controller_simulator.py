@@ -29,6 +29,11 @@ Usage: python3 example_controller_simulator.py
 Press Ctrl+C to exit.
 """
 
+import sys
+import os
+# Add parent directory to path so we can import robot package
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from robot.controller import eventLoop, connectToController
 from robot.mecanum import makeMotorVector
 

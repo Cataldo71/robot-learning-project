@@ -14,6 +14,11 @@ Concepts demonstrated:
 For a more advanced controller test, see: example_controller_simulator.py
 """
 
+import sys
+import os
+# Add parent directory to path so we can import robot package
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from robot.controller import eventLoop, connectToController
 
 print('Simple Controller Test starting...')

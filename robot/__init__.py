@@ -21,7 +21,7 @@ Example usage:
 """
 
 # Make key components easily accessible
-from robot import controller, motor, mecanum, drive
+from . import controller, motor, mecanum, drive
 
 __version__ = "1.0.0"
 __all__ = ['controller', 'motor', 'mecanum', 'drive']
