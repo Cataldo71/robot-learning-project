@@ -1,10 +1,37 @@
-# GPIO Wiring Guide - Raspberry Pi 5 with L298N Motor Controllers
+# GPIO Wiring Guide - Raspberry Pi with L298N Motor Controllers
 
 ## Hardware Overview
-- **Raspberry Pi 5** - Main controller
+- **Raspberry Pi 5 (or Pi 4, 3, Zero 2 W)** - Main controller
 - **2x L298N Motor Driver Boards** - Dual H-bridge motor controllers
 - **4x DC Motors** - Mecanum wheel configuration
 - **Power Supply** - 12V for motors (L298N can handle 5-35V)
+
+---
+
+## Software Setup
+
+Before wiring, install the required Python libraries:
+
+### For Raspberry Pi 5:
+```bash
+sudo apt update
+sudo apt install -y python3-evdev python3-rpi-lgpio
+```
+
+### For Raspberry Pi 4 and older:
+```bash
+sudo apt update
+sudo apt install -y python3-evdev python3-rpi.gpio
+```
+
+**Why the difference?**
+- Raspberry Pi 5 has new GPIO hardware that requires `rpi-lgpio`
+- `rpi-lgpio` is a drop-in replacement with the same API as `RPi.GPIO`
+- The code works with both libraries automatically
+
+**What these libraries do:**
+- `python3-evdev` - Reads game controller input
+- `python3-rpi-lgpio` or `python3-rpi.gpio` - Controls GPIO pins for motor control
 
 ---
 
@@ -177,12 +204,27 @@ GND (Pin 30)     ──→ GND
 2. **Visual Check** - Verify all connections against this diagram
 3. **Power ON** - Connect power supply (motors should NOT move)
 4. **Test Controller** - Run `python3 examples/controller_simulator.py` (no motor movement)
-5. **Test Motors** - Run `python3 tests/test_motors.py` to test individual motors
-6. **Full Test** - Run `python3 run_robot.py` with controller
+5. **Test Motors** - Run `sudo python3 tests/test_motors.py` to test individual motors (needs sudo for GPIO)
+6. **Full Test** - Run `sudo python3 run_robot.py` with controller (needs sudo for GPIO)
 
 ---
 
 ## Troubleshooting
+
+### "Cannot determine SOC peripheral base address" or GPIO errors:
+- **Solution:** Run scripts with `sudo` for GPIO access
+- Example: `sudo python3 tests/test_motors.py`
+- This is required for all scripts that control motors
+
+### Wrong GPIO library for your Pi model:
+- **Raspberry Pi 5:** Needs `python3-rpi-lgpio`
+  ```bash
+  sudo apt install python3-rpi-lgpio
+  ```
+- **Raspberry Pi 4 and older:** Needs `python3-rpi.gpio`
+  ```bash
+  sudo apt install python3-rpi.gpio
+  ```
 
 ### Motor doesn't move:
 - Check enable jumpers (ENA/ENB) are in place
@@ -234,5 +276,6 @@ Pin 30, 39 (or any GND pin) → Motor Controller GND
 
 ---
 
-**Last Updated:** February 16, 2026  
-**Hardware:** Raspberry Pi 5 + 2x L298N + 4x Mecanum Motors
+**Last Updated:** February 18, 2026  
+**Hardware:** Raspberry Pi (5, 4, 3, or similar) + 2x L298N + 4x Mecanum Motors  
+**Software:** Works with both `rpi-lgpio` (Pi 5) and `RPi.GPIO` (older models)

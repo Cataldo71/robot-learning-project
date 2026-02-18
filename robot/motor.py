@@ -14,6 +14,10 @@ Key Concepts:
 - PWM: Pulse Width Modulation - controls motor speed by rapidly switching power on/off
 - Duty Cycle: Percentage of time power is ON (0-100%). Higher = faster motor speed
 - H-Bridge: Circuit that allows motors to spin both directions
+
+Compatibility:
+- Works with both RPi.GPIO (Pi 4 and older) and rpi-lgpio (Pi 5)
+- The import statement works with either library installed
 """
 
 import RPi.GPIO as GPIO

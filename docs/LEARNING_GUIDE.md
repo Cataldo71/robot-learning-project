@@ -213,6 +213,20 @@ See `GPIO_WIRING_GUIDE.md` for complete wiring instructions!
 
 ## 🚀 Quick Start Guide
 
+### Step 0: Install Required Libraries (First Time Only)
+
+**For Raspberry Pi 5:**
+```bash
+sudo apt update
+sudo apt install -y python3-evdev python3-rpi-lgpio
+```
+
+**For Raspberry Pi 4 and older:**
+```bash
+sudo apt update
+sudo apt install -y python3-evdev python3-rpi.gpio
+```
+
 ### Step 1: Test Without Hardware
 ```bash
 # Test your controller (no motors needed)
@@ -223,22 +237,22 @@ python3 examples/read_controller.py
 
 ### Step 2: Test Motors
 ```bash
-# Test each motor individually
-python3 tests/test_motors.py
+# Test each motor individually (requires sudo for GPIO)
+sudo python3 tests/test_motors.py
 # Watch motors spin forward then backward
 ```
 
 ### Step 3: Test Movements
 ```bash
-# Test mecanum movements
-python3 tests/test_movements.py
+# Test mecanum movements (requires sudo for GPIO)
+sudo python3 tests/test_movements.py
 # Watch robot perform different movements
 ```
 
 ### Step 4: Run the Robot!
 ```bash
-# Full robot control with game controller
-python3 run_robot.py
+# Full robot control with game controller (requires sudo for GPIO)
+sudo python3 run_robot.py
 # Drive around!
 # Press Ctrl+C to stop
 ```
@@ -431,20 +445,23 @@ You now have all the knowledge to:
 ## 📝 Quick Command Reference
 
 ```bash
+# First Time Setup - Install required libraries
+# For Raspberry Pi 5:
+sudo apt install -y python3-evdev python3-rpi-lgpio
+# For Raspberry Pi 4 and older:
+sudo apt install -y python3-evdev python3-rpi.gpio
+
 # Examples (No Hardware) - Can run from any directory
 python3 examples/read_controller.py      # Simple controller test
 python3 examples/controller_simulator.py # Advanced controller test
 
-# Tests (Hardware Required) - Can run from any directory
-python3 tests/test_motors.py          # Test individual motors
-python3 tests/test_movements.py       # Test mecanum movements
-python3 examples/tank_drive.py        # Simple tank drive
+# Tests (Hardware Required) - Need sudo for GPIO access
+sudo python3 tests/test_motors.py          # Test individual motors
+sudo python3 tests/test_movements.py       # Test mecanum movements
+sudo python3 examples/tank_drive.py        # Simple tank drive
 
-# Main Program - Run from project root
-python3 run_robot.py                  # Full robot control ⭐
-
-# Note: Motor tests need sudo for GPIO access
-sudo python3 tests/test_motors.py
+# Main Program - Need sudo for GPIO access
+sudo python3 run_robot.py                  # Full robot control ⭐
 
 # Stop Any Program
 Ctrl+C                                # Press in terminal

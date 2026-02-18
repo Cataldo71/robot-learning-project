@@ -11,22 +11,40 @@ A complete beginner-friendly robotics project for building and programming a mec
 
 ## 🚀 Quick Start
 
-### For Students Learning Robotics:
+### 1. Software Setup (First Time Only)
+
+**For Raspberry Pi 5:**
+```bash
+# Install required libraries
+sudo apt update
+sudo apt install -y python3-evdev python3-rpi-lgpio
+```
+
+**For Raspberry Pi 4 and older:**
+```bash
+# Install required libraries
+sudo apt update
+sudo apt install -y python3-evdev python3-rpi.gpio
+```
+
+**Note:** Raspberry Pi 5 uses `rpi-lgpio` which is a drop-in replacement for the older `RPi.GPIO` library. The code works with both!
+
+### 2. For Students Learning Robotics:
 See **[docs/LEARNING_GUIDE.md](docs/LEARNING_GUIDE.md)** for complete learning path from beginner to advanced!
 
-### For Hardware Setup:
+### 3. For Hardware Setup:
 See **[docs/GPIO_WIRING_GUIDE.md](docs/GPIO_WIRING_GUIDE.md)** for complete wiring instructions.
 
-### To Run the Robot:
+### 4. To Run the Robot:
 ```bash
 # 1. Test controller (no motors needed)
 python3 examples/read_controller.py
 
-# 2. Test motors
-python3 tests/test_motors.py
+# 2. Test motors (requires sudo for GPIO access)
+sudo python3 tests/test_motors.py
 
 # 3. Run the robot!
-python3 run_robot.py
+sudo python3 run_robot.py
 ```
 
 ## 📁 Project Structure
