@@ -1,281 +1,131 @@
 # GPIO Wiring Guide - Raspberry Pi with L298N Motor Controllers
 
+This guide focuses on **wiring workflow and bring-up**.
+
+For exact wiring maps (GPIO-to-IN pins, OUTx-to-motor posts, and detailed power terminal diagrams), use:
+- [L298N_DUAL_DRIVER_DIAGRAM.md](L298N_DUAL_DRIVER_DIAGRAM.md)
+
+For wheel A/B placement and mecanum movement concepts, use:
+- [MECANUM_WHEEL_INSTALL_AND_MOVEMENT.md](MECANUM_WHEEL_INSTALL_AND_MOVEMENT.md)
+
 ## Hardware Overview
+
 - **Raspberry Pi 5 (or Pi 4, 3, Zero 2 W)** - Main controller
 - **2x L298N Motor Driver Boards** - Dual H-bridge motor controllers
 - **4x DC Motors** - Mecanum wheel configuration
-- **Power Supply** - 12V for motors (L298N can handle 5-35V)
+- **Two power sources**:
+  - Pi PSU: 5V USB-C for Raspberry Pi
+  - Motor PSU: 12V battery/supply for L298N motor power
 
----
+## Wiring Architecture (Mermaid)
+
+```mermaid
+flowchart LR
+  PAD[Controller Input]
+  PI[Raspberry Pi]
+  A[L298N A Left Side]
+  B[L298N B Right Side]
+  M1[M1 Front-Left]
+  M2[M2 Back-Left]
+  M3[M3 Front-Right]
+  M4[M4 Back-Right]
+  PIPSU[Pi PSU 5V USB-C]
+  MPSU[Motor PSU 12V]
+  GND[Common Ground]
+
+  PAD --> PI
+  PI -- GPIO signals --> A
+  PI -- GPIO signals --> B
+
+  A --> M1
+  A --> M2
+  B --> M3
+  B --> M4
+
+  PIPSU --> PI
+  MPSU --> A
+  MPSU --> B
+
+  PI --- GND
+  A --- GND
+  B --- GND
+  MPSU --- GND
+```
 
 ## Software Setup
 
-Before wiring, install the required Python libraries:
+Install required libraries before testing motors.
 
-### For Raspberry Pi 5:
+### For Raspberry Pi 5
+
 ```bash
 sudo apt update
 sudo apt install -y python3-evdev python3-rpi-lgpio
 ```
 
-### For Raspberry Pi 4 and older:
+### For Raspberry Pi 4 and older
+
 ```bash
 sudo apt update
 sudo apt install -y python3-evdev python3-rpi.gpio
 ```
 
-**Why the difference?**
-- Raspberry Pi 5 has new GPIO hardware that requires `rpi-lgpio`
-- `rpi-lgpio` is a drop-in replacement with the same API as `RPi.GPIO`
-- The code works with both libraries automatically
+## Wiring Order (Recommended)
 
-**What these libraries do:**
-- `python3-evdev` - Reads game controller input
-- `python3-rpi-lgpio` or `python3-rpi.gpio` - Controls GPIO pins for motor control
+1. **Power off everything** (Pi and motor PSU disconnected).
+2. **Wire motor outputs first** using [L298N_DUAL_DRIVER_DIAGRAM.md](L298N_DUAL_DRIVER_DIAGRAM.md).
+3. **Wire GPIO signal pins** from Pi to both L298N boards (use the exact map in the diagram doc).
+4. **Wire power terminals**:
+   - Motor PSU `+` to each L298N `+12V/VS`
+   - Motor PSU `-` to each L298N `GND`
+   - Pi `GND` to the same common ground network
+5. **Leave Pi 5V isolated** from L298N motor `+12V` rail.
+6. **Confirm ENA/ENB jumpers are installed** (unless intentionally using EN pins for PWM).
 
----
+## Pre-Power Checklist
 
-## Motor Layout (Mecanum Wheels)
-
-```
-    FRONT
-  ┌─────────┐
-  │  1   3  │
-  │         │
-  │  2   4  │
-  └─────────┘
-    BACK
-
-Motor 1: Front-Left
-Motor 2: Back-Left
-Motor 3: Front-Right
-Motor 4: Back-Right
-```
-
----
-
-## Raspberry Pi 5 GPIO Pinout (Relevant Pins)
-
-```
-        3.3V  [ 1] [ 2]  5V
-              [ 3] [ 4]  5V
-              [ 5] [ 6]  GND
-              [ 7] [ 8]  
-         GND  [ 9] [10]  
-    GPIO 17  [11] [12]  
-    GPIO 27  [13] [14]  GND
-    GPIO 22  [15] [16]  
-        3.3V [17] [18]  
-              [19] [20]  GND
-              [21] [22]  
-              [23] [24]  
-         GND  [25] [26]  
-              [27] [28]  
-     GPIO 5  [29] [30]  GND
-     GPIO 6  [31] [32]  
-    GPIO 13  [33] [34]  GND
-    GPIO 19  [35] [36]  GPIO 16
-    GPIO 26  [37] [38]  GPIO 20
-         GND [39] [40]  GPIO 21
-```
-
----
-
-## GPIO Pin Assignments (From Code)
-
-| GPIO Pin | Physical Pin | Function | Motor Controller |
-|----------|--------------|----------|------------------|
-| GPIO 21  | Pin 40       | Motor 1 Forward | Controller A - IN1 |
-| GPIO 20  | Pin 38       | Motor 1 Backward | Controller A - IN2 |
-| GPIO 16  | Pin 36       | Motor 2 Forward | Controller A - IN3 |
-| GPIO 26  | Pin 37       | Motor 2 Backward | Controller A - IN4 |
-| GPIO 19  | Pin 35       | Motor 3 Forward | Controller B - IN1 |
-| GPIO 13  | Pin 33       | Motor 3 Backward | Controller B - IN2 |
-| GPIO 6   | Pin 31       | Motor 4 Forward | Controller B - IN3 |
-| GPIO 5   | Pin 29       | Motor 4 Backward | Controller B - IN4 |
-
----
-
-## L298N Motor Controller Pinout
-
-Each L298N has these connections:
-
-```
-L298N Motor Driver Board
-┌────────────────────────────────┐
-│                                │
-│  Motor A  [OUT1] [OUT2]        │  ← Connect to Motor 1 or 3
-│  Motor B  [OUT3] [OUT4]        │  ← Connect to Motor 2 or 4
-│                                │
-│  Control  [IN1]  [IN2]         │  ← PWM signals from Pi
-│  Inputs   [IN3]  [IN4]         │  ← PWM signals from Pi
-│                                │
-│  Enable   [ENA]  [ENB]         │  ← Jumpers ON (or PWM for speed)
-│                                │
-│  Power    [12V]  [GND] [5V]    │  
-│                                │
-└────────────────────────────────┘
-```
-
----
-
-## Wiring Diagram
-
-### Controller A (Left Side Motors - Motors 1 & 2)
-
-```
-Raspberry Pi          L298N Controller A          Motors
-GPIO 21 (Pin 40) ──→ IN1  ──→ OUT1 ──┐
-GPIO 20 (Pin 38) ──→ IN2  ──→ OUT2 ──┴─→ Motor 1 (Front-Left)
-
-GPIO 16 (Pin 36) ──→ IN3  ──→ OUT3 ──┐
-GPIO 26 (Pin 37) ──→ IN4  ──→ OUT4 ──┴─→ Motor 2 (Back-Left)
-
-GND (Pin 39)     ──→ GND
-                     12V  ←─── 12V Power Supply (+)
-                     GND  ←─── 12V Power Supply (-)
-```
-
-### Controller B (Right Side Motors - Motors 3 & 4)
-
-```
-Raspberry Pi          L298N Controller B          Motors
-GPIO 19 (Pin 35) ──→ IN1  ──→ OUT1 ──┐
-GPIO 13 (Pin 33) ──→ IN2  ──→ OUT2 ──┴─→ Motor 3 (Front-Right)
-
-GPIO 6  (Pin 31) ──→ IN3  ──→ OUT3 ──┐
-GPIO 5  (Pin 29) ──→ IN4  ──→ OUT4 ──┴─→ Motor 4 (Back-Right)
-
-GND (Pin 30)     ──→ GND
-                     12V  ←─── 12V Power Supply (+)
-                     GND  ←─── 12V Power Supply (-)
-```
-
----
-
-## Complete Wiring Checklist
-
-### For Each L298N Motor Controller:
-
-✅ **Power Connections:**
-- [ ] Connect 12V from power supply to **12V** terminal
-- [ ] Connect GND from power supply to **GND** terminal
-- [ ] Connect Raspberry Pi GND to motor controller **GND** (share common ground)
-- [ ] Leave **5V** output disconnected (or use for Pi if PSU doesn't have built-in 5V out)
-
-✅ **Enable Jumpers:**
-- [ ] Place jumpers on **ENA** and **ENB** pins (enables motors)
-- [ ] Alternative: Connect to GPIO for speed control (not used in current code)
-
-✅ **GPIO Connections:**
-- [ ] IN1, IN2, IN3, IN4 to respective GPIO pins (see table above)
-- [ ] Use Female-to-Female jumper wires
-
-✅ **Motor Connections:**
-- [ ] Connect motor wires to OUT1/OUT2 for Motor A
-- [ ] Connect motor wires to OUT3/OUT4 for Motor B
-- [ ] If motor spins backwards, swap the two motor wires
-
----
-
-## Power Supply Requirements
-
-- **Voltage:** 6-12V DC (typical for hobby DC motors)
-- **Current:** At least 2A per motor = 8A total minimum
-- **Recommended:** 12V 10A power supply with barrel connector
-- **Important:** Do NOT power motors from Raspberry Pi's 5V pins!
-
----
-
-## Safety Notes
-
-⚠️ **CRITICAL:**
-1. **NEVER** connect motor power directly to Raspberry Pi
-2. **ALWAYS** share common ground between Pi and motor controllers
-3. **CHECK** polarity before connecting power supply
-4. **TEST** one motor at a time initially
-5. **FUSE** your power supply if possible (10A fuse recommended)
-
----
+- [ ] No loose strands or reversed polarity at L298N power terminals
+- [ ] Common ground present between Pi and both L298N boards
+- [ ] Pi 5V is not connected to motor `+12V`
+- [ ] OUT wires match motor mapping in [L298N_DUAL_DRIVER_DIAGRAM.md](L298N_DUAL_DRIVER_DIAGRAM.md)
+- [ ] IN wires match GPIO mapping in [L298N_DUAL_DRIVER_DIAGRAM.md](L298N_DUAL_DRIVER_DIAGRAM.md)
+- [ ] Both boards have ENA/ENB jumpers fitted
 
 ## Testing Sequence
 
-1. **Power OFF** - Wire everything with power disconnected
-2. **Visual Check** - Verify all connections against this diagram
-3. **Power ON** - Connect power supply (motors should NOT move)
-4. **Test Controller** - Run `python3 examples/controller_simulator.py` (no motor movement)
-5. **Test Motors** - Run `sudo python3 tests/test_motors.py` to test individual motors (needs sudo for GPIO)
-6. **Full Test** - Run `sudo python3 run_robot.py` with controller (needs sudo for GPIO)
-
----
+1. **Controller read test**
+   ```bash
+   python3 examples/read_controller.py
+   ```
+2. **Motor test (GPIO access needs sudo)**
+   ```bash
+   sudo python3 tests/test_motors.py
+   ```
+3. **Full robot test**
+   ```bash
+   sudo python3 run_robot.py
+   ```
 
 ## Troubleshooting
 
-### "Cannot determine SOC peripheral base address" or GPIO errors:
-- **Solution:** Run scripts with `sudo` for GPIO access
-- Example: `sudo python3 tests/test_motors.py`
-- This is required for all scripts that control motors
+### GPIO access errors
 
-### Wrong GPIO library for your Pi model:
-- **Raspberry Pi 5:** Needs `python3-rpi-lgpio`
-  ```bash
-  sudo apt install python3-rpi-lgpio
-  ```
-- **Raspberry Pi 4 and older:** Needs `python3-rpi.gpio`
-  ```bash
-  sudo apt install python3-rpi.gpio
-  ```
+- Run motor scripts with `sudo`.
+- Pi 5 should use `python3-rpi-lgpio`; older Pi models should use `python3-rpi.gpio`.
 
-### Motor doesn't move:
-- Check enable jumpers (ENA/ENB) are in place
-- Verify GPIO pin connections
-- Test motor directly with power supply
-- Check motor controller has power (LED should be on)
+### Motors do not move
 
-### Motor spins wrong direction:
-- Swap the two motor wires on OUT terminals
-- Or modify code to invert the PWM signal
+- Check motor PSU voltage/current capability.
+- Confirm ENA/ENB jumpers are installed.
+- Verify common ground between Pi and L298N boards.
+- Re-check mapping in [L298N_DUAL_DRIVER_DIAGRAM.md](L298N_DUAL_DRIVER_DIAGRAM.md).
 
-### Multiple motors don't work:
-- Check power supply can provide enough current
-- Verify common ground connection
-- Test each motor controller independently
+### One wheel spins wrong way
 
----
+- Swap that motor's two OUT wires (or invert in software).
 
 ## Reference Links
 
 - **Project Page:** https://messyprogress.substack.com/p/easy-robotics-with-a-3d-printer-and
 - **Motor Controllers:** https://www.amazon.com/dp/B07BK1QL5T
 - **Raspberry Pi GPIO:** https://pinout.xyz
-
----
-
-## Quick Reference: GPIO to Pin Mapping
-
-```python
-# Motor 1 (Front-Left)
-GPIO 21 (Pin 40) → Forward
-GPIO 20 (Pin 38) → Backward
-
-# Motor 2 (Back-Left)  
-GPIO 16 (Pin 36) → Forward
-GPIO 26 (Pin 37) → Backward
-
-# Motor 3 (Front-Right)
-GPIO 19 (Pin 35) → Forward
-GPIO 13 (Pin 33) → Backward
-
-# Motor 4 (Back-Right)
-GPIO 6  (Pin 31) → Forward
-GPIO 5  (Pin 29) → Backward
-
-# Ground connections
-Pin 30, 39 (or any GND pin) → Motor Controller GND
-```
-
----
-
-**Last Updated:** February 18, 2026  
-**Hardware:** Raspberry Pi (5, 4, 3, or similar) + 2x L298N + 4x Mecanum Motors  
-**Software:** Works with both `rpi-lgpio` (Pi 5) and `RPi.GPIO` (older models)

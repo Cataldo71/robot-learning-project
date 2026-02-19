@@ -2,8 +2,8 @@
 Simple Controller to Motor Example (Intermediate Level)
 ========================================================
 This script shows how to use controller input to control motors directly.
-It's a simplified version that controls just 2 motors (left and right)
-using the controller joysticks.
+It's a simplified tank-drive example for the full 4-motor robot,
+where each joystick controls one side of the drivetrain.
 
 This is an educational stepping stone between:
 - example_read_controller.py (just reading input)
@@ -15,12 +15,12 @@ Concepts demonstrated:
 - Direct motor control without vector math
 
 Requirements:
-- 2 motors minimum (Motor 1 and Motor 2)
+- 4 motors (Motor 1-4)
 - Game controller
 
 Controls:
-- Left stick Y-axis: Controls Motor 1 (left side)
-- Right stick Y-axis: Controls Motor 2 (right side)
+- Left stick Y-axis: Controls left side (Motor 1 + Motor 2)
+- Right stick Y-axis: Controls right side (Motor 3 + Motor 4)
 
 Note: This does NOT use mecanum wheel math. For full mecanum control,
 use run_robot.py instead.
@@ -34,7 +34,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from robot import controller
 from robot import motor
 from robot.controller import eventLoop
-from robot.motor import motorForward, motorBackward, moveMotor1, moveMotor2, initMotors
+from robot.motor import motorForward, motorBackward, moveMotor1, moveMotor2, moveMotor3, moveMotor4, initMotors
 
 print('Controller to Motor Example')
 print('=' * 60)
@@ -47,8 +47,8 @@ initMotors()
 print('Motors ready!')
 print()
 print('This example uses simple tank-drive control:')
-print('  - Left stick Y:  Controls Motor 1 (left side)')
-print('  - Right stick Y: Controls Motor 2 (right side)')
+print('  - Left stick Y:  Controls left side (Motor 1 + Motor 2)')
+print('  - Right stick Y: Controls right side (Motor 3 + Motor 4)')
 print()
 print('Press Ctrl+C to exit')
 print('-' * 60)
@@ -72,9 +72,9 @@ def onStick(stick, value):
     """
     Handle joystick movements and control motors.
     
-    This maps each stick directly to a motor:
-    - Left stick (stick1-Y) → Motor 1
-    - Right stick (stick2-Y) → Motor 2
+    This maps each stick to one side of the robot:
+    - Left stick (stick1-Y) → Left side (Motor 1 + Motor 2)
+    - Right stick (stick2-Y) → Right side (Motor 3 + Motor 4)
     
     This creates "tank drive" style control where each side
     is controlled independently, like a tank or bulldozer.
@@ -82,15 +82,16 @@ def onStick(stick, value):
     print('stick', stick, value)
     
     if stick == 'stick1-Y':
-        # Left stick controls Motor 1
-        # We pass 'value' directly - positive = forward, negative = backward
+        # Left stick controls LEFT side motors
+        # Positive = forward, negative = backward
         moveMotor1(value)
+        moveMotor2(value)
         
     elif stick == 'stick2-Y':
-        # Right stick controls Motor 2
-        # We negate the value because this motor faces opposite direction
-        # (This depends on your wiring - adjust if needed)
-        moveMotor2(-value)
+        # Right stick controls RIGHT side motors
+        # Note: if right side runs opposite, invert these values in wiring or code
+        moveMotor3(value)
+        moveMotor4(value)
 
 
 # Start the event loop

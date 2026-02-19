@@ -30,10 +30,14 @@ sudo apt install -y python3-evdev python3-rpi.gpio
 **Note:** Raspberry Pi 5 uses `rpi-lgpio` which is a drop-in replacement for the older `RPi.GPIO` library. The code works with both!
 
 ### 2. For Students Learning Robotics:
-See **[docs/LEARNING_GUIDE.md](docs/LEARNING_GUIDE.md)** for complete learning path from beginner to advanced!
+See **[docs/SOFTWARE_LEARNING_GUIDE.md](docs/SOFTWARE_LEARNING_GUIDE.md)** for complete software learning path from beginner to advanced!
 
 ### 3. For Hardware Setup:
 See **[docs/GPIO_WIRING_GUIDE.md](docs/GPIO_WIRING_GUIDE.md)** for complete wiring instructions.
+
+Need a visual-only wiring reference? See **[docs/L298N_DUAL_DRIVER_DIAGRAM.md](docs/L298N_DUAL_DRIVER_DIAGRAM.md)**.
+
+For wheel mounting orientation and mecanum movement concepts, see **[docs/MECANUM_WHEEL_INSTALL_AND_MOVEMENT.md](docs/MECANUM_WHEEL_INSTALL_AND_MOVEMENT.md)**.
 
 ### 4. To Run the Robot:
 ```bash
@@ -68,7 +72,7 @@ easy-robo/
 │   └── test_movements.py
 │
 ├── docs/                     # Documentation
-│   ├── LEARNING_GUIDE.md
+│   ├── SOFTWARE_LEARNING_GUIDE.md
 │   └── GPIO_WIRING_GUIDE.md
 │
 ├── run_robot.py              # Main program - run the robot!
@@ -90,7 +94,7 @@ All three can be used simultaneously for complex movements!
 2. Test motors individually with `tests/test_motors.py`
 3. Run the full robot with `run_robot.py`!
 
-See [docs/LEARNING_GUIDE.md](docs/LEARNING_GUIDE.md) for detailed instructions.
+See [docs/SOFTWARE_LEARNING_GUIDE.md](docs/SOFTWARE_LEARNING_GUIDE.md) for detailed instructions.
 
 ## 🔗 Resources
 

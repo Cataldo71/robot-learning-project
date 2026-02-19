@@ -1,4 +1,4 @@
-# Easy Robot - Learning Guide for Students
+# Easy Robot - Software Learning Guide for Students
 
 ## 🎓 Welcome to Robotics Programming!
 
@@ -116,7 +116,7 @@ easy-robo/
 │
 └── Documentation
     ├── README.md           - Project overview
-    ├── LEARNING_GUIDE.md   - This file!
+    ├── SOFTWARE_LEARNING_GUIDE.md   - This file!
     └── GPIO_WIRING_GUIDE.md - Hardware wiring instructions
 ```
 
